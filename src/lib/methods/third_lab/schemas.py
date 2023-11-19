@@ -81,7 +81,12 @@ def get_probability_schema_7(probabilities: list[float | int]) -> int | float:
 
 
 def get_probability_schema_8(probabilities: list[float | int]) -> int | float:
-    ...
+    pp1 = get_parallel(get_parallel(probabilities[1], probabilities[2]), probabilities[3])
+
+    pp2 = get_parallel(get_parallel(probabilities[4], probabilities[5]), probabilities[6])
+    pp3 = get_parallel(probabilities[7], pp2)
+
+    return get_forward([probabilities[0], pp1, pp3, probabilities[8], probabilities[9]])
 
 
 def get_probability_schema_9(probabilities: list[float | int]) -> int | float:
@@ -231,8 +236,6 @@ def get_probability_schema_20(probabilities: list[float | int]) -> int | float:
 
 
 def get_probability_schema_21(probabilities: list[float | int]) -> int | float:
-    # то же самое что и 3
-    pass
     pp1 = get_parallel(probabilities[0], get_forward(probabilities[1:4]))
     pp2 = get_parallel(probabilities[4], get_parallel(probabilities[5], probabilities[6]))
     pf1 = get_forward([pp2, get_parallel(probabilities[8], probabilities[9])])
@@ -249,7 +252,7 @@ SCHEMAS = {
     5: get_probability_schema_5,
     6: get_probability_schema_6,
     7: get_probability_schema_7,
-    # 8: get_probability_schema_8,
+    8: get_probability_schema_8,
     9: get_probability_schema_9,
     10: get_probability_schema_10,
     11: get_probability_schema_11,
