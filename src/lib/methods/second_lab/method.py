@@ -61,4 +61,4 @@ def calculate_method(request: methods_second_part_models.SecondLabModel):
     t_values = np.linspace(0, request.t_max / 3600, request.n)
     graph = MplCanvas(request.n, t_values, request.lambda_, a, b, c)
 
-    return t_values, graph
+    return "Построена область и график", graph
