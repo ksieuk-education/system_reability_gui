@@ -98,7 +98,7 @@ QScrollBar::ad-page:vertical, QScrollBar::sub-page:vertical, QScrollBar::add-pag
 	background: none;
 }</string>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3,4,0,1,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3,3,0,1,0">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -243,8 +243,8 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
 }
 
 QScrollBar:horizontal {
-    border: 2px solid green;
-    background: cyan;
+    border: 2px darkgray;
+    background: silver;
     height: 15px;
     margin: 0px 40px 0 0px;
 }
@@ -255,27 +255,21 @@ QScrollBar::handle:horizontal {
 }
 
 QScrollBar::add-line:horizontal {
-    background: blue;
+    background: lightslategray;
     width: 16px;
     subcontrol-position: right;
     subcontrol-origin: margin;
-    border: 2px solid black;
+    border: 1px solid black;
 }
 
 QScrollBar::sub-line:horizontal {
-    background: magenta;
+    background: lightslategray;
     width: 16px;
     subcontrol-position: top right;
     subcontrol-origin: margin;
-    border: 2px solid black;
-    position: absolute;
+    border: 1px solid black;
     right: 20px;
-}
-
-QScrollBar:left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
-    width: 3px;
-    height: 3px;
-    background: pink;
+    margin: 2px 0px 0px
 }
 
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {

@@ -23,7 +23,7 @@ class UiService(pyqt6_qtwidgets.QMainWindow, ui_repositories.Ui_MainWindow):
         self.cb_variants.activated.connect(self.on_variant)
         self.lab_number = 1
         self.variant_number = 1
-        self.methods = methods_config.LAB_3_METHODS
+        self.methods = methods_config.LAB_1_METHODS
         self.connect_list_widget()
 
     def on_variant(self, value):
@@ -44,6 +44,9 @@ class UiService(pyqt6_qtwidgets.QMainWindow, ui_repositories.Ui_MainWindow):
     def on_lab(self, value):
         self.lab_number = value + 1
         self.delete_image()
+        if self.lab_number == 1:
+            self.methods = methods_config.LAB_1_METHODS
+
         if self.lab_number == 2:
             self.methods = methods_config.LAB_2_METHODS
 
