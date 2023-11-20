@@ -188,7 +188,6 @@ class MplCanvas(matplotlib_backend_qtagg.FigureCanvasQTAgg):
         self.axes.set_yticks(np.arange(0, 10.1, 0.1))
         self.axes.tick_params(axis="both", which="major", labelsize=1)
 
-
         super(MplCanvas, self).__init__(plt_)
 
 
