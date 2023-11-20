@@ -110,7 +110,7 @@ class UiService(pyqt6_qtwidgets.QMainWindow, ui_repositories.Ui_MainWindow):
             raise ValueError
         items = [self.list_input.item(row) for row in range(self.list_input.count())]
         input_values = {
-            self.list_input.itemWidget(item).text()[0]: self.list_input.itemWidget(item).text()[1]  # type: ignore
+            self.list_input.itemWidget(item).text()[0]: self.list_input.itemWidget(item).text()[1].replace(",", ".")  # type: ignore
             for item in items
         }
         input_values["variant"] = self.variant_number
