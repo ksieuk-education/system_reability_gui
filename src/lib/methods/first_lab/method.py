@@ -120,7 +120,7 @@ class MplCanvas(matplotlib_backend_qtagg.FigureCanvasQTAgg):
         x1_intersection,
         x2_intersection,
         width=10,
-        height=4,
+        height=10,
         dpi=100,
     ):
         plt_ = matplotlib_figure.Figure(figsize=(width, height), dpi=dpi)
@@ -187,6 +187,8 @@ class MplCanvas(matplotlib_backend_qtagg.FigureCanvasQTAgg):
         self.axes.set_xticks(np.arange(0, 10.1, 0.1))
         self.axes.set_yticks(np.arange(0, 10.1, 0.1))
         self.axes.tick_params(axis="both", which="major", labelsize=1)
+        self.axes.set_xlim(x1_min-.8*x1_min, x1_max+.8*x1_max)
+        self.axes.set_ylim(x2_min-.8*x2_min, x2_max+.8*x2_max)
 
         super(MplCanvas, self).__init__(plt_)
 
