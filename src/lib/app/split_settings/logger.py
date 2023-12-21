@@ -34,12 +34,10 @@ def get_logging_config(
         "formatters": {
             "verbose": {"format": log_format},
             "default": {
-                "()": "uvicorn.logging.DefaultFormatter",
                 "fmt": "%(levelprefix)s %(message)s",
                 "use_colors": None,
             },
             "access": {
-                "()": "uvicorn.logging.AccessFormatter",
                 "fmt": "%(levelprefix)s %(client_addr)s - '%(request_line)s' %(status_code)s",
             },
         },
@@ -64,14 +62,6 @@ def get_logging_config(
             "": {
                 "handlers": log_default_handlers,
                 "level": log_level_loggers,
-            },
-            "uvicorn.error": {
-                "level": log_level_loggers,
-            },
-            "uvicorn.access": {
-                "handlers": ["access"],
-                "level": log_level_loggers,
-                "propagate": False,
             },
         },
         "root": {
