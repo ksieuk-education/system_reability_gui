@@ -1,5 +1,6 @@
 import PyQt6.QtCore as pyqt6_qtcore
 import PyQt6.QtWidgets as pyqt6_qtwidgets
+import pydantic
 from pydantic import ValidationError
 
 import lib.app.split_settings.ui as app_split_settings_ui
@@ -14,6 +15,7 @@ class UiService(pyqt6_qtwidgets.QMainWindow, ui_repositories.Ui_MainWindow):
         self.setupUi(self)
         self.list_input.setSpacing(5)
         self.pb_calculate.clicked.connect(self.on_calculate)
+        self.pb_save_input.clicked.connect(self.on_save_input)
         self.method_selected_model, self.method_selected = None, None
         self.text_entry.setText("Здесь будет результат работы программы")
         self.picture_obj = None
@@ -25,6 +27,9 @@ class UiService(pyqt6_qtwidgets.QMainWindow, ui_repositories.Ui_MainWindow):
         self.variant_number = 1
         self.methods = methods_config.LAB_1_METHODS
         self.connect_list_widget()
+        self.method_title: str | None = None
+        self.input_data: pydantic.BaseModel | None = None
+        self.input_data_method: str | None = None
 
     def on_variant(self, value):
         self.variant_number = value + 1
@@ -88,10 +93,10 @@ class UiService(pyqt6_qtwidgets.QMainWindow, ui_repositories.Ui_MainWindow):
         self.delete_image()
         self.text_entry.setText("Здесь будет результат работы программы")
 
-        method_title = item.text()
-        assert method_title in self.methods
+        self.method_title = item.text()
+        assert self.method_title in self.methods
 
-        self.method_selected_model, self.method_selected = self.methods[method_title]
+        self.method_selected_model, self.method_selected = self.methods[self.method_title]
         model_schema = self.method_selected_model.model_json_schema()
         if "required" in model_schema:
             model_schema.pop("required")
@@ -102,10 +107,14 @@ class UiService(pyqt6_qtwidgets.QMainWindow, ui_repositories.Ui_MainWindow):
         ]
         values_names = list(model_schema["properties"].keys())
         values_default = [value.get("default") for value in model_schema["properties"].values()]
+        if self.input_data and self.input_data_method == self.method_title:
+            values_default = list(self.input_data.model_dump().values())
+            # print(self.input_data.model_dump())
+            # print(values_default)
         self.create_fields_input(titles, values_names, values_default)
         self.set_schema_image()
 
-    def get_input_text(self) -> list[str]:
+    def get_input_text(self) -> pydantic.BaseModel:
         if not self.method_selected_model:
             raise ValueError
         items = [self.list_input.item(row) for row in range(self.list_input.count())]
@@ -129,12 +138,21 @@ class UiService(pyqt6_qtwidgets.QMainWindow, ui_repositories.Ui_MainWindow):
             error_messages.append(f"{message}. Поле: {', '.join(error.get('loc'))}")
         return "\n".join(error_messages)
 
+    def on_save_input(self):
+        if not self.method_selected:
+            self.text_entry.setText("Сначала нужно выбрать метод")
+            return
+        self.input_data = self.get_input_text()
+        self.input_data_method = self.method_title
+        self.text_entry.setText("Данные успешно сохранены")
+
     def on_calculate(self):
         if not self.method_selected:
             self.text_entry.setText("Сначала нужно выбрать метод")
             return
         try:
-            result = self.method_selected(self.get_input_text())
+            input_data = self.get_input_text()
+            result = self.method_selected(input_data)
             if isinstance(result, tuple):
                 result, graph = result
                 size_policy = pyqt6_qtwidgets.QSizePolicy(
@@ -146,6 +164,7 @@ class UiService(pyqt6_qtwidgets.QMainWindow, ui_repositories.Ui_MainWindow):
 
                 self.delete_image()
                 self.picture_obj = graph
+            result = str(result)
 
         except ValidationError as e:
             result = self.__get_error_message(e.errors())
@@ -153,7 +172,43 @@ class UiService(pyqt6_qtwidgets.QMainWindow, ui_repositories.Ui_MainWindow):
             result = str(e)
         except RecursionError:
             result = "Ошибка: Бесконечный цикл. Проверьте значение шага."
-        self.text_entry.setText(str(result))
+        except ZeroDivisionError:
+            result = "Ошибка: Деление на ноль. Проверьте введенные значения"
+        except Exception:
+            result = "Ошибка при выполнении программы. Проверьте введенные значения"
+        else:
+            if self.input_data and self.input_data_method == self.method_title:
+                if isinstance(self.input_data, methods_config.methods_first_lab.FirstLabModel):
+                    price = (
+                        abs(self.input_data.x1_min - input_data.x1_min)  # type: ignore
+                        + abs(self.input_data.x1_max - input_data.x1_max)  # type: ignore
+                        + abs(self.input_data.x2_min - input_data.x2_min)  # type: ignore
+                        + abs(self.input_data.x2_max - input_data.x2_max)  # type: ignore
+                        + abs(self.input_data.y1_min - input_data.y1_min)  # type: ignore
+                        + abs(self.input_data.y1_max - input_data.y1_max)  # type: ignore
+                        + abs(self.input_data.y2_min - input_data.y2_min)  # type: ignore
+                        + abs(self.input_data.y2_max - input_data.y2_max)  # type: ignore
+                    )
+                    result += f"\nСтоимость испытаний: {price} единиц(ы)"
+                if isinstance(self.input_data, methods_config.methods_third_lab.PermanentReserveModel):
+                    price = abs(self.input_data.reserve - input_data.reserve) * 10  # type: ignore
+                    result += f"\nСтоимость испытаний: {price} единиц(ы)"
+                if isinstance(self.input_data, methods_config.methods_third_lab.ThirdLabModel):
+                    price = (
+                        abs(self.input_data.reserve_1 - input_data.reserve_1)  # type: ignore
+                        + abs(self.input_data.reserve_2 - input_data.reserve_2)  # type: ignore
+                        + abs(self.input_data.reserve_3 - input_data.reserve_3)  # type: ignore
+                        + abs(self.input_data.reserve_4 - input_data.reserve_4)  # type: ignore
+                        + abs(self.input_data.reserve_5 - input_data.reserve_5)  # type: ignore
+                        + abs(self.input_data.reserve_6 - input_data.reserve_6)  # type: ignore
+                        + abs(self.input_data.reserve_7 - input_data.reserve_7)  # type: ignore
+                        + abs(self.input_data.reserve_8 - input_data.reserve_8)  # type: ignore
+                        + abs(self.input_data.reserve_9 - input_data.reserve_9)  # type: ignore
+                        + abs(self.input_data.reserve_10 - input_data.reserve_10)  # type: ignore
+                    )
+                    result += f"\nСтоимость испытаний: {price} единиц(ы)"
+
+        self.text_entry.setText(result)
 
     def delete_image(self):
         if not self.picture_obj:
