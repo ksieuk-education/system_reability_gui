@@ -41,17 +41,5 @@ class FirstLabModel(pydantic.BaseModel):
     )
     @classmethod
     def check_limits(cls, value: float) -> float:
-        assert 0 < value, ValueError("Значение не может быть меньше 0")
+        assert 0 <= value, ValueError("Значение не может быть меньше 0")
         return value
-
-    # @pydantic.field_validator("probability")
-    # @classmethod
-    # def probability_limits(cls, value: float) -> float:
-    #     assert 0 < value < 1, ValueError("Вероятность должна быть в пределах (0, 1)")
-    #     return value
-    #
-    # @pydantic.field_validator("accuracy")
-    # @classmethod
-    # def accuracy_limits(cls, value: float) -> float:
-    #     assert 0 < value < 1, ValueError("Точность должна быть в пределах (0, 1)")
-    #     return value
