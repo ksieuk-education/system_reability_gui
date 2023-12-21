@@ -24,7 +24,7 @@ class Application:
         self._ui_service = ui_service
 
     @classmethod
-    def from_settings(cls, settings: app_settings.Settings) -> typing.Self:
+    def from_settings(cls, settings: app_settings.Settings) -> "Application":
         # Logging
 
         logging_config.dictConfig(app_split_settings.get_logging_config(**settings.logger.model_dump()))
